@@ -43,7 +43,7 @@ eliminarVitoria:-
 generarVictoria:-
     assert(victoria(0)).
 iniciarDinamicas:-
-    assert(rondas([])),
+    assert(rondas([1])),
     generarCorrecto,
     correcto(A),
     write(A),
@@ -59,6 +59,7 @@ eliminarBuenosYRegulares:-
     retract(buenos(_)),
     retract(regulares(_)).
 
+
 /*Aumenta lista que contiene la cantidad de ValorYPos igual*/
 aumentarBuenos:-
     buenos(B),
@@ -73,6 +74,13 @@ aumentarRegulares:-
     append([1],R,NR),
     assert(regulares(NR)).    
 
+/*Aumenta Rondas*/
+aumentarRondas:-
+    rondas(R),
+    retract(rondas(R)),
+    append([1],R,NR),
+    assert(rondas(NR)).    
+
 
 /*Esta funcion se encarga de revisar si el usuario dio el numero exacto que tenemos generado
     Tambien muestra la victoria del usuario
@@ -80,8 +88,11 @@ aumentarRegulares:-
 comparar([A,B,C,D],[A,B,C,D],_,_):-
     nl,nl,
     write('EL NUMERO ES CORRECTO'),nl,nl,
-    eliminarCorrecto,
-    eliminarVitoria,
+    rondas(R),
+    sumar(R,Rondas),
+    terminarJuego(Rondas),
+    write('Rondas: '), write(Rondas),nl,nl,
+    eliminarDinamicas,
     assert(victoria(1)),menu.
 
 
@@ -99,17 +110,14 @@ comparar([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
     sumar(Reg,Regulares),
     write('Iguales en valor y posicion: '),write(Buenos),nl,
     write('Iguales en valor: '),write(Regulares),nl,nl,nl,
-    eliminarBuenosYRegulares,play.
+    eliminarBuenosYRegulares,aumentarRondas,play. /*POR AHORA VOY A AUMENTAR LAS RONDAS AQUI*/
 
 
 /*Funcion que ayuda a probrar el juego cuando el usuario adivina
     Utilizada solo en tiempo de desarrollo*/
 /*BORRAR PARA LA ENTREGA*/
 fee:-
-    generarCorrecto,
-    correcto(A),
-    write(A),
-    generarVictoria.
+    iniciarDinamicas.
 
 
 /*Esta funcion va a cargar con todo el ciclo del juego
@@ -187,14 +195,9 @@ pedirNombre:-
 
 /*Esta solo es una funcion de ayuda para saltar a play con todo iniciado correctamente*/
 jugar:-
-    /*Pedir Nombre*/
-    iniciarDinamicas,
-
-    /**/
-    adivino,
-    /**/
-
-    eliminarDinamicas.
+    pedirNombre,
+    fee,
+    play.
 
 
 /*funcion para borrar todos los puntajes
@@ -212,13 +215,13 @@ cleanPuntaje:-
 */
 
 /*una opcion es hacer otra con parametros distintos para cuando el user no gana*/
-terminarJuego:-
+terminarJuego(R):-
     path_file('puntaje.pl',Path),
     catch(consult(Path), _, cleanPuntaje),
     consult(Path), /*Con esto obtenjo los puntajes*/
     puntaje(P),
     jugador(J),
-    random(20,30,R),/*ronda(R)*/
+    write(R),/*ronda(R)*/
     append([R],[J],JR),
     my_append(JR,P,NewP),
     tell(Path),
@@ -269,7 +272,7 @@ my_append(Lista1,Lista2,[Lista1|Lista2]).
 
 
 /*Opcion para jugar*/
-opcion("1"):- pedirNombre,write('Proceso del juego'),terminarJuego,nl,run.
+opcion("1"):- jugar,nl,run.
 
 /*opcion de mostrar el puntaje*/
 opcion("2"):- write('-----------------------------------'),nl,verPuntaje,nl,nl,write('-----------------------------------'),nl,nl,run.
