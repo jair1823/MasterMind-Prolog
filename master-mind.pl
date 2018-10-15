@@ -6,7 +6,7 @@
 
 /***********************************************************************/
 
-working_dir('/home/corderoluis/Documents/Lenguajes/Prolog/progra/').
+working_dir('/home/corderoluis/git_workspace/MasterMind-Prolog/').
 
 path_file(Name,Path):-
     working_dir(Dir),
@@ -229,9 +229,9 @@ my_append(Lista1,Lista2,[Lista1|Lista2]).
 
 
 
-opcion("1"):- pedirNombre,jugar,terminarJuego,nl,run.
+opcion("1"):- pedirNombre,write('Proceso del juego'),terminarJuego,nl,run.
 opcion("2"):- write('-----------------------------------'),nl,verPuntaje,nl,nl,write('-----------------------------------'),nl,nl,run.
-opcion(_):- write("Me salgo del programa"),consult('/home/corderoluis/Documents/Lenguajes/Prolog/progra/juego.pl').
+opcion(_):- write("Me salgo del programa"),!.
 
 menu:-
     write('1. Jugar.'),nl,
@@ -245,7 +245,7 @@ menu:-
 /*write('\033[2J')*/
 
 run:- menu,nl.
-
+                    
 /*
 run:- menu,nl,nl,nl,
 write("Desea continuar(s/n)"),read(Ch), =(Ch,'n').
