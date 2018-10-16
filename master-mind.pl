@@ -46,7 +46,9 @@ iniciarDinamicas:-
     assert(rondas([1])),
     generarCorrecto,
     correcto(A),
-    write(A),
+    nl,nl,
+    write('Oculto: '),write(A),
+    nl,nl,
     generarVictoria.
 eliminarDinamicas:-
     retract(rondas(_)),
@@ -79,6 +81,8 @@ aumentarRondas:-
     rondas(R),
     retract(rondas(R)),
     append([1],R,NR),
+    write('Rondas: '),
+    write(NR),
     assert(rondas(NR)).    
 
 
@@ -91,7 +95,6 @@ comparar([A,B,C,D],[A,B,C,D],_,_):-
     rondas(R),
     sumar(R,Rondas),
     terminarJuego(Rondas),
-    write('Rondas: '), write(Rondas),nl,nl,
     eliminarDinamicas,
     assert(victoria(1)),menu.
 
@@ -120,6 +123,27 @@ fee:-
     iniciarDinamicas.
 
 
+leerNumero(N1,N2,N3,N4):-
+    nl,
+    write('Digite una Secuencia de 4 numeros'),nl,nl,
+    get_char(A),get_char(B),get_char(C),get_char(D),
+    read_string(user_input, "\n", "\r", _, _),
+    (member(A,['1','2','3','4','5','6','7','8','9','0']),
+        member(B,['1','2','3','4','5','6','7','8','9','0']),
+        member(C,['1','2','3','4','5','6','7','8','9','0']),
+        member(D,['1','2','3','4','5','6','7','8','9','0']),N1 = A, N2 = B,N3 = C, N4 = D,!;
+        write('Debe ser un Secuencia de 4 numeros'),nl,
+        leerNumero(A1,B1,C1,D1),N1 = A1, N2 = B1, N3 = C1, N4 = D1).
+/*
+leerNumero(String,Num):-
+    write(String),nl,
+    get_char(X),
+    read_string(user_input, "\n", "\r", _, _),
+    nl,
+    writeq(X),
+    (member(X,['1','2','3','4','5','6','7','8','9','0']), Num = X,!; leerNumero(String,Num1),Num = Num1).
+*/
+
 /*Esta funcion va a cargar con todo el ciclo del juego
     Es decir que cada ejecucion de esta funcion se toma como una ronda
         Primero el usuario trata de adivinar el numero generado
@@ -137,10 +161,13 @@ fee:-
                     Incorrecto
                         Se procede a aumentar la roda y ejecutar de nuevo*/
 play:-
-    write('Ingrese el posible numero'),nl,
+    nl,
+    rondas(R),
+    sumar(R,Rondas),
+    write('Ronda '),write(Rondas),nl,
+    write('Ingrese el posible numero'),
     path_file('compu.pl',Path),
-    get_char(N1),get_char(N2),get_char(N3),get_char(N4),
-    read_string(user_input, "\n", "\r", _, String),
+    leerNumero(N1,N2,N3,N4),
     tell(Path),
     write('propuesto(['),
         write(N1),
@@ -154,7 +181,8 @@ play:-
     told,
     consult(Path),
     /*para este punto tengo el correcto y el brindado por el usuario toca comparar*/
-    propuesto(Propuesto),
+    propuesto(Propuesto),nl,
+    write('Propuesto: '),write(Propuesto),nl,
     correcto(Correcto),
     comparar(Propuesto,Correcto,I,J).
 
@@ -330,3 +358,4 @@ run:-
 
 
 
+:-shell(clear),menu.
