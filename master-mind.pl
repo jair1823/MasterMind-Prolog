@@ -47,13 +47,13 @@ iniciarDinamicas:-
     generarCorrecto,
     correcto(A),
     nl,nl,
-    write('Oculto: '),write(A),
+    write('Oculto: '),write('Nop esta vez'),
     nl,nl,
     generarVictoria.
 eliminarDinamicas:-
-    retract(rondas(_)),
-    eliminarCorrecto,
-    eliminarVitoria.
+    (retract(rondas(_));write('')),
+    (eliminarCorrecto;write('')),
+    (eliminarVitoria;write('')).
 iniciarBuenosYRegulares:-
     assert(buenos([])),
     assert(regulares([])).
@@ -96,12 +96,12 @@ comparar([A,B,C,D],[A,B,C,D],_,_):-
     sumar(R,Rondas),
     terminarJuego(Rondas),
     eliminarDinamicas,
-    assert(victoria(1)),menu.
+    assert(victoria(1)).
 
 
 /*Esta funcion se encarga de comparar los numeros ingresados por el usuario con el valor generardo aleatoriamente
     Tambien imprime esta informacion para el usuario*/
-comparar([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
+comparar1([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
     iniciarBuenosYRegulares,
     (A == E, aumentarBuenos; member(A,[F,G,H]),aumentarRegulares;write('')),
     (B == F, aumentarBuenos; member(B,[E,G,H]),aumentarRegulares;write('')),
@@ -115,11 +115,35 @@ comparar([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
     write('Iguales en valor: '),write(Regulares),nl,nl,nl,
     eliminarBuenosYRegulares,aumentarRondas,play. /*POR AHORA VOY A AUMENTAR LAS RONDAS AQUI*/
 
+compararValor([X],Lista):-
+    (member(X,Lista),aumentarRegulares; write('')).
+compararValor([X|Resto],Lista):-
+    (member(X,Lista),aumentarRegulares; write('')),
+    compararValor(Resto,Lista).
+
+comparar([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
+    iniciarBuenosYRegulares,
+    Pro = [],
+    Cor = [],
+    (A == E, aumentarBuenos,Pro1 = Pro, Cor1 = Cor; append([A],Pro,Pro1), append([E],Cor,Cor1)),
+    (B == F, aumentarBuenos,Pro2 = Pro1, Cor2 = Cor1; append([B],Pro1,Pro2), append([F],Cor1,Cor2)),
+    (C == G, aumentarBuenos,Pro3 = Pro2, Cor3 = Cor2; append([C],Pro2,Pro3), append([G],Cor2,Cor3)),
+    (D == H, aumentarBuenos,Pro4 = Pro3, Cor4 = Cor3; append([D],Pro3,Pro4), append([H],Cor3,Cor4)),
+    compararValor(Pro4,Cor4),
+    buenos(Bue),
+    regulares(Reg),
+    sumar(Bue,Buenos),
+    sumar(Reg,Regulares),
+    write('Iguales en valor y posicion: '),write(Buenos),nl,
+    write('Iguales en valor: '),write(Regulares),nl,nl,nl,
+    eliminarBuenosYRegulares,aumentarRondas,play. /*POR AHORA VOY A AUMENTAR LAS RONDAS AQUI*/
+
 
 /*Funcion que ayuda a probrar el juego cuando el usuario adivina
     Utilizada solo en tiempo de desarrollo*/
 /*BORRAR PARA LA ENTREGA*/
 fee:-
+    eliminarDinamicas,
     iniciarDinamicas.
 
 
@@ -249,7 +273,7 @@ terminarJuego(R):-
     consult(Path), /*Con esto obtenjo los puntajes*/
     puntaje(P),
     jugador(J),
-    write(R),/*ronda(R)*/
+    write('Rondas : '),write(R),nl,/*ronda(R)*/
     append([R],[J],JR),
     my_append(JR,P,NewP),
     tell(Path),
@@ -306,7 +330,7 @@ opcion("1"):- jugar,nl,run.
 opcion("2"):- write('-----------------------------------'),nl,verPuntaje,nl,nl,write('-----------------------------------'),nl,nl,run.
 
 /*opcion para salir del programa*/
-opcion(_):- write("Me salgo del programa"),!.
+opcion(_):- write("Se cerro el programa :D"),nl,nl,halt.
 
 
 /*Funcion que muestra las opciones del programa
