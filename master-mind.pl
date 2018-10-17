@@ -11,7 +11,6 @@
     SIN INCLUIR EL NOMBRE DEL ARCHIVO
 
 
-
 working_dir('/home/corderoluis/git_workspace/MasterMind-Prolog/').
 TODO ESTO QUEDA EN PAUSA MIENTRAS working_directory siga funcionando... probar en windows!
 */
@@ -78,10 +77,10 @@ eliminarDinamicas:-
     (retract(rondas(_));write('')),
     (eliminarCorrecto;write('')),
     (eliminarVitoria;write('')).
-iniciarBuenosYRegulares:-
+beginB_R:-
     (retract(buenos(_)) , assert(buenos([])); assert(buenos([])) ),
     (retract(regulares(_)) , assert(regulares([])) ; assert(regulares([]))).
-eliminarBuenosYRegulares:-
+deleteB_R:-
     retract(buenos(_)),
     retract(regulares(_)).
 
@@ -101,7 +100,7 @@ succR:-
     assert(regulares(NR)).
 
 /*Aumenta Rondas*/
-aumentarRondas:-
+succR:-
     rondas(R),
     retract(rondas(R)),
     append([1],R,NR),
@@ -117,7 +116,7 @@ check([A,B,C,D],[A,B,C,D],_,_):-
     nl,nl,
     write('EL NUMERO ES CORRECTO'),nl,nl,
     rondas(R),
-    sumar(R,Rondas),
+    succ(R,Rondas),
     terminarJuego(Rondas),
     eliminarDinamicas,
     assert(victoria(1)).
@@ -138,7 +137,7 @@ checkV([A|Resto],Lista):-
     checkV(A,Lista,Resultado),checkV(Resto,Resultado).
 
 check([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
-    iniciarBuenosYRegulares,
+    beginB_R,
     Pro = [],
     Cor = [],
     (A == E, succB,Pro1 = Pro, Cor1 = Cor; append([A],Pro,Pro1), append([E],Cor,Cor1)),
@@ -148,18 +147,37 @@ check([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
     checkV(Pro4,Cor4),
     buenos(Bue),
     regulares(Reg),
-    sumar(Bue,Buenos),
-    sumar(Reg,Regulares),
+    succ(Bue,Buenos),
+    succ(Reg,Regulares),
     write('Iguales en valor y posicion: '),write(Buenos),nl,
     write('Iguales en valor: '),write(Regulares),nl,nl,nl,
-    eliminarBuenosYRegulares,aumentarRondas,play. /*POR AHORA VOY A AUMENTAR LAS RONDAS AQUI*/
+    deleteB_R,succR,play. /*POR AHORA VOY A AUMENTAR LAS RONDAS AQUI*/
 
 /*Funcion que ayuda a probrar el juego cuando el usuario adivina
     Utilizada solo en tiempo de desarrollo*/
 fee:-
     eliminarDinamicas,
     iniciarDinamicas.
+/*******************************************************************************/
 
+generarSecuencia(S):-
+  random(0,10,S1),
+  random(0,10,S2),
+  random(0,10,S3),
+  random(0,10,S4),
+  S = [S1,S2,S3,S4].
+
+leerSN(X,Respuesta):-
+  nl,
+  write('Su numero es: '),write(X),write('?(Y/N)'),nl,
+  get_char(R),
+  read_string(user_input, "\n", "\r", _, _).
+
+
+
+inicio:-
+    genearSecuencia(X).
+/*******************************************************************************/
 
 leerNumero(N1,N2,N3,N4):-
     nl,
@@ -201,7 +219,7 @@ leerNumero(String,Num):-
 play:-
     nl,
     rondas(R),
-    sumar(R,Rondas),
+    succ(R,Rondas),
     write('Ronda '),write(Rondas),nl,
     write('Ingrese el posible numero'),
     path_file('compu.pl',Path),
@@ -229,9 +247,9 @@ play:-
     [1,1,1,1] = 4
     sirve para contar los numeros que estan en valorYpos bien o los de solo valor
     y tambien para el numero de rondas*/
-sumar([],0).
-sumar([X|Resto],Resultado):-
-    sumar(Resto,Resultado1),
+succ([],0).
+succ([X|Resto],Resultado):-
+    succ(Resto,Resultado1),
     Resultado is X + Resultado1.
 
 
