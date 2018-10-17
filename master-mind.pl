@@ -23,6 +23,30 @@ path_file(Name,Path):-
     working_directory(Dir,Dir),
     atom_concat(Dir,Name,Path).
 
+borrarPantalla:-
+     write('\033[2J'),shell(clear).
+
+
+marge:-
+    write(" ("),nl,
+    write("  \\  _,--._,-.__,         )"),nl,
+    write("  / (,  ,       ,`-._    /"),nl,
+    write(" (  ,^--^-. ;--^--/ (    \\"),nl,
+    write("  :'      `/       \\ )   /"),nl,
+    write("  (  o    (   o    |(  \\'"),nl,
+    write("   \\  ,----\\       /(,-.)"),nl,
+    write("  ,'`-\\___  `.___,'  ,. )"),nl,
+    write(",'                   __/"),nl,
+    write("`-.______________   |,---,"),nl,
+    write("      `-^;-^--^-'\\  |   '----,"),nl,
+    write("        ( '------'  .',-.___/"),nl,
+    write("         ;._____,--' / \\"),nl,
+    write(" -hrr-  (           /   \\"),nl,
+    write("        (`-        /     \\"),nl,
+    write("         \\       ,'       \\"),nl,
+    write("        / )  _,-'          \\").
+
+
 /************************************************************************/
 
 /*Estas dos ultimas se encargan de generar y eliminar un numero aleatorio para cada juego*/
@@ -74,7 +98,7 @@ aumentarRegulares:-
     regulares(R),
     retract(regulares(R)),
     append([1],R,NR),
-    assert(regulares(NR)).    
+    assert(regulares(NR)).
 
 /*Aumenta Rondas*/
 aumentarRondas:-
@@ -83,7 +107,7 @@ aumentarRondas:-
     append([1],R,NR),
     write('Rondas: '),
     write(NR),
-    assert(rondas(NR)).    
+    assert(rondas(NR)).
 
 
 /*Esta funcion se encarga de revisar si el usuario dio el numero exacto que tenemos generado
@@ -180,7 +204,7 @@ leerNumero(String,Num):-
                         y preguntar si esa lista no esta en la lista de listas, para no repetir estados,
                             eso lo hace exhaustivo...
                     Correcto
-                        Se detiene el proceso y se le dice al usuario que perdio por ende no se almacena 
+                        Se detiene el proceso y se le dice al usuario que perdio por ende no se almacena
                         Se borra todo lo que se deba borrar(Rondas, Victoria, Correcto)
                     Incorrecto
                         Se procede a aumentar la roda y ejecutar de nuevo*/
@@ -300,7 +324,7 @@ mostrarPuntaje([X]):-
 mostrarPuntaje([X|Resto]):-
     escribirPuntaje(X),
     mostrarPuntaje(Resto).
-mostrarPuntaje([]):- 
+mostrarPuntaje([]):-
     write('No hay puntajes').
 
 
@@ -343,7 +367,7 @@ menu:-
     write('1. Jugar.'),nl,
     write('2. Ver puntajes.'),nl,
     write('Cualquier otro para salir'),nl,nl,
-    write('Digite el numero'),nl,read_string(user_input, "\n", "\r", _, String),shell(clear),nl,
+    write('Digite el numero'),nl,read_string(user_input, "\n", "\r", _, String),borrarPantalla,nl,
     opcion(String).
 
 
@@ -353,7 +377,7 @@ menu:-
 
 /*Funcion para el loop del menu*/
 run:- menu,nl.
-                    
+
 /*
 run:- menu,nl,nl,nl,
 write("Desea continuar(s/n)"),read(Ch), =(Ch,'n').
@@ -365,21 +389,4 @@ run:-
 
 */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-:-shell(clear),menu.
+:- borrarPantalla,write("Utilizar la sentencia 'menu.' para comenzar el juego.").
