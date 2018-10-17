@@ -87,14 +87,14 @@ eliminarBuenosYRegulares:-
 
 
 /*Aumenta lista que contiene la cantidad de ValorYPos igual*/
-aumentarBuenos:-
+succB:-
     buenos(B),
     retract(buenos(B)),
     append([1],B,NB),
     assert(buenos(NB)).
 
 /*Aumenta lista que contiene la cantidad de solo valor igual*/
-aumentarRegulares:-
+succR:-
     regulares(R),
     retract(regulares(R)),
     append([1],R,NR),
@@ -113,7 +113,7 @@ aumentarRondas:-
 /*Esta funcion se encarga de revisar si el usuario dio el numero exacto que tenemos generado
     Tambien muestra la victoria del usuario
     Esta tiene que saltar a terminarJuego(Cuando user gana)*/
-comparar([A,B,C,D],[A,B,C,D],_,_):-
+check([A,B,C,D],[A,B,C,D],_,_):-
     nl,nl,
     write('EL NUMERO ES CORRECTO'),nl,nl,
     rondas(R),
@@ -122,70 +122,30 @@ comparar([A,B,C,D],[A,B,C,D],_,_):-
     eliminarDinamicas,
     assert(victoria(1)).
 
-
-/*Esta funcion se encarga de comparar los numeros ingresados por el usuario con el valor generardo aleatoriamente
-    Tambien imprime esta informacion para el usuario*/
-comparar1([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
-    iniciarBuenosYRegulares,
-    (A == E, aumentarBuenos; member(A,[F,G,H]),aumentarRegulares;write('')),
-    (B == F, aumentarBuenos; member(B,[E,G,H]),aumentarRegulares;write('')),
-    (C == G, aumentarBuenos; member(C,[F,E,H]),aumentarRegulares;write('')),
-    (D == H, aumentarBuenos; member(D,[F,G,E]),aumentarRegulares;write('')),nl,
-    buenos(Bue),
-    regulares(Reg),
-    sumar(Bue,Buenos),
-    sumar(Reg,Regulares),
-    write('Iguales en valor y posicion: '),write(Buenos),nl,
-    write('Iguales en valor: '),write(Regulares),nl,nl,nl,
-    eliminarBuenosYRegulares,aumentarRondas,play. /*POR AHORA VOY A AUMENTAR LAS RONDAS AQUI*/
-
-compararValor([X],Lista):-
-    (member(X,Lista),aumentarRegulares; write('')).
-compararValor([X|Resto],Lista):-
-    (member(X,Lista),aumentarRegulares; write('')),
-    compararValor(Resto,Lista).
-
-
-/*posible correcto necesito confirmar con Chepe*/
-compararValor2(E, [X], Restante):-
-    (E == X, Restante = [], aumentarRegulares,!
+checkV(E, [X], Restante):-
+    (E == X, Restante = [], succR,!
     ;
     Restante = [X]).
 
-compararValor2(E,[X|Resto],Restante):-
-    (E == X, Restante = Resto, aumentarRegulares,!
+checkV(E,[X|Resto],Restante):-
+    (E == X, Restante = Resto, succR,!
     ;
-    compararValor2(E,Resto,Restante2), append([X],Restante2,Restante)).
-/*
-compararValor3([A,B,C,D],Lista,Resultado):-
-    compararValor2(A,Lista,R1),
-    compararValor2(B,R1,R2),
-    compararValor2(C,R2,R3),
-    compararValor2(D,R3,Resultado),!.
-compararValor3([A,B,C],Lista,Resultado):-
-    compararValor2(A,Lista,R1),
-    compararValor2(B,R1,R2),
-    compararValor2(C,R2,Resultado),!.
-compararValor3([A,B],Lista,Resultado):-
-    compararValor2(A,Lista,R1),
-    compararValor2(B,R1,Resultado),!.
-compararValor3([A],Lista,Resultado):-
-    compararValor2(A,Lista,Resultado),!.
-*/
-compararValor3([A],Lista):-
-    compararValor2(A,Lista,_),!.
-compararValor3([A|Resto],Lista):-
-    compararValor2(A,Lista,Resultado),compararValor3(Resto,Resultado).
+    checkV(E,Resto,Restante2), append([X],Restante2,Restante)).
 
-comparar([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
+checkV([A],Lista):-
+    checkV(A,Lista,_),!.
+checkV([A|Resto],Lista):-
+    checkV(A,Lista,Resultado),checkV(Resto,Resultado).
+
+check([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
     iniciarBuenosYRegulares,
     Pro = [],
     Cor = [],
-    (A == E, aumentarBuenos,Pro1 = Pro, Cor1 = Cor; append([A],Pro,Pro1), append([E],Cor,Cor1)),
-    (B == F, aumentarBuenos,Pro2 = Pro1, Cor2 = Cor1; append([B],Pro1,Pro2), append([F],Cor1,Cor2)),
-    (C == G, aumentarBuenos,Pro3 = Pro2, Cor3 = Cor2; append([C],Pro2,Pro3), append([G],Cor2,Cor3)),
-    (D == H, aumentarBuenos,Pro4 = Pro3, Cor4 = Cor3; append([D],Pro3,Pro4), append([H],Cor3,Cor4)),
-    compararValor3(Pro4,Cor4),
+    (A == E, succB,Pro1 = Pro, Cor1 = Cor; append([A],Pro,Pro1), append([E],Cor,Cor1)),
+    (B == F, succB,Pro2 = Pro1, Cor2 = Cor1; append([B],Pro1,Pro2), append([F],Cor1,Cor2)),
+    (C == G, succB,Pro3 = Pro2, Cor3 = Cor2; append([C],Pro2,Pro3), append([G],Cor2,Cor3)),
+    (D == H, succB,Pro4 = Pro3, Cor4 = Cor3; append([D],Pro3,Pro4), append([H],Cor3,Cor4)),
+    checkV(Pro4,Cor4),
     buenos(Bue),
     regulares(Reg),
     sumar(Bue,Buenos),
@@ -194,36 +154,8 @@ comparar([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
     write('Iguales en valor: '),write(Regulares),nl,nl,nl,
     eliminarBuenosYRegulares,aumentarRondas,play. /*POR AHORA VOY A AUMENTAR LAS RONDAS AQUI*/
 
-/*
-compararDefinitivo([A,B,C,D],[A,B,C,D]):-
-    writenl('Listas iguales').
-
-compararDefinitivo([A,B,C,D],[E,F,G,H]):-
-  iniciarBuenosYRegulares,
-  Pro = [],
-  Cor = [],
-  (A == E, aumentarBuenos,Pro1 = Pro, Cor1 = Cor;
-              append([A],Pro,Pro1), append([E],Cor,Cor1)),
-  (B == F, aumentarBuenos,Pro2 = Pro1, Cor2 = Cor1;
-              append([B],Pro1,Pro2), append([F],Cor1,Cor2)),
-  (C == G, aumentarBuenos,Pro3 = Pro2, Cor3 = Cor2;
-              append([C],Pro2,Pro3), append([G],Cor2,Cor3)),
-  (D == H, aumentarBuenos,Pro4 = Pro3, Cor4 = Cor3;
-              append([D],Pro3,Pro4), append([H],Cor3,Cor4)),
-
-  compararValor(Pro4,Cor4),
-  buenos(Bue),
-  regulares(Reg),
-  sumar(Bue,Buenos),
-  sumar(Reg,Regulares),
-  write('Iguales en valor y posicion: '),write(Buenos),nl,
-  write('Iguales en valor: '),write(Regulares),nl,nl,nl,
-  eliminarBuenosYRegulares.
-*/
-
 /*Funcion que ayuda a probrar el juego cuando el usuario adivina
     Utilizada solo en tiempo de desarrollo*/
-/*BORRAR PARA LA ENTREGA*/
 fee:-
     eliminarDinamicas,
     iniciarDinamicas.
@@ -286,11 +218,11 @@ play:-
     write(']).'),
     told,
     consult(Path),
-    /*para este punto tengo el correcto y el brindado por el usuario toca comparar*/
+    /*para este punto tengo el correcto y el brindado por el usuario toca check*/
     propuesto(Propuesto),nl,
     write('Propuesto: '),write(Propuesto),nl,
     correcto(Correcto),
-    comparar(Propuesto,Correcto,I,J).
+    check(Propuesto,Correcto,I,J).
 
 
 /*Esta funcion recibe una lista con numeros y retorna su suma
