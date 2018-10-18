@@ -70,7 +70,7 @@ iniciarDinamicas:-
     generarCorrecto,
     correcto(A),
     nl,nl,
-    write('Oculto: '),write(A),
+    write('Oculto: '),write('[?,?,?,?]'),
     nl,nl,
     generarVictoria.
 eliminarDinamicas:-
@@ -107,6 +107,7 @@ succR:-
     write('Rondas: '),
     write(NR),
     assert(rondas(NR)).
+
 
 
 /*Esta funcion se encarga de revisar si el usuario dio el numero exacto que tenemos generado
@@ -159,24 +160,46 @@ fee:-
     eliminarDinamicas,
     iniciarDinamicas.
 /*******************************************************************************/
+dinamicaParaAdivinar:-
+  generarSecuencia(X),
+  assert(propuesto(X)).
 
 generarSecuencia(S):-
-  random(0,10,S1),
-  random(0,10,S2),
-  random(0,10,S3),
-  random(0,10,S4),
+  random(0,4,S1),
+  random(0,4,S2),
+  random(0,4,S3),
+  random(0,4,S4),
   S = [S1,S2,S3,S4].
+/*
+igualesValor(_).
+*/
+pedirIguales:-
+	igualesValorPos(VP),
+	igualesValor(V).
 
-leerSN(X,Respuesta):-
-  nl,
-  write('Su numero es: '),write(X),write('?(Y/N)'),nl,
-  get_char(R),
-  read_string(user_input, "\n", "\r", _, _).
 
+eliminarPropuesto:-
+  (retract(propuesto(_)),eliminarPropuesto;
+    nl,write('Elimine Propuesto'),nl).
 
-
+eliminarDinamicaParaAdivinar:-
+  eliminarPropuesto.
+leerSN:-
+	nl,
+  propuesto(P),
+	write('Su numero es: '),write(P),write('?(Y/N)'),nl,
+	get_char(R),
+	read_string(user_input, "\n", "\r", _, _),
+	(
+		(member(R,['Y','y']),write('Termino :)'),!;
+		member(R,['N','n']),write('Sigue')
+	);
+	write('Tiene que ser Y/N'),nl,leerSN(X)
+	).
 inicio:-
-    genearSecuencia(X).
+    dinamicaParaAdivinar,
+    leerSN,
+    eliminarDinamicaParaAdivinar,!.
 /*******************************************************************************/
 
 leerNumero(N1,N2,N3,N4):-
@@ -287,6 +310,7 @@ jugar:-
 /*funcion para borrar todos los puntajes
     solo utilizada en tiempos desarrollo del juego*/
 cleanPuntaje:-
+    writeln('Clean'),
     path_file('puntaje.pl',Path),
     tell(Path),
     write( 'puntaje(' ) ,
@@ -340,10 +364,12 @@ mostrarPuntaje([]):-
 verPuntaje:-
     path_file('puntaje.pl',Path),
     catch(consult(Path), _, cleanPuntaje),
+    catch(puntaje(P), _, cleanPuntaje),
+    consult(Path),
+    borrarPantalla,
     write('Lista de puntajes'),nl,nl,
     write('Rondas'),put(9),put(9),write('Nombre'),nl,nl,
-    consult(Path), /*Con esto obtenjo los puntajes*/
-    puntaje(P),
+     /*Con esto obtenjo los puntajes*/
     mostrarPuntaje(P).
 
 
@@ -385,6 +411,7 @@ menu:-
 
 /*Funcion para el loop del menu*/
 run:- menu,nl.
+
 
 /*
 run:- menu,nl,nl,nl,
