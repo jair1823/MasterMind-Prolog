@@ -69,6 +69,7 @@ iniciarDinamicas:-
     assert(rondas([1])),
     generarCorrecto,
     correcto(A),
+    write(A),
     nl,nl,
     write('Oculto: '),write('[?,?,?,?]'),
     nl,nl,
@@ -100,7 +101,7 @@ succR:-
     assert(regulares(NR)).
 
 /*Aumenta Rondas*/
-succR:-
+succRondas:-
     rondas(R),
     retract(rondas(R)),
     append([1],R,NR),
@@ -152,7 +153,7 @@ check([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
     succ(Reg,Regulares),
     write('Iguales en valor y posicion: '),write(Buenos),nl,
     write('Iguales en valor: '),write(Regulares),nl,nl,nl,
-    deleteB_R,succR,play. /*POR AHORA VOY A AUMENTAR LAS RONDAS AQUI*/
+    deleteB_R,succRondas,play. /*POR AHORA VOY A AUMENTAR LAS RONDAS AQUI*/
 
 /*Funcion que ayuda a probrar el juego cuando el usuario adivina
     Utilizada solo en tiempo de desarrollo*/
@@ -160,46 +161,9 @@ fee:-
     eliminarDinamicas,
     iniciarDinamicas.
 /*******************************************************************************/
-dinamicaParaAdivinar:-
-  generarSecuencia(X),
-  assert(propuesto(X)).
-
-generarSecuencia(S):-
-  random(0,4,S1),
-  random(0,4,S2),
-  random(0,4,S3),
-  random(0,4,S4),
-  S = [S1,S2,S3,S4].
-/*
-igualesValor(_).
-*/
-pedirIguales:-
-	igualesValorPos(VP),
-	igualesValor(V).
 
 
-eliminarPropuesto:-
-  (retract(propuesto(_)),eliminarPropuesto;
-    nl,write('Elimine Propuesto'),nl).
 
-eliminarDinamicaParaAdivinar:-
-  eliminarPropuesto.
-leerSN:-
-	nl,
-  propuesto(P),
-	write('Su numero es: '),write(P),write('?(Y/N)'),nl,
-	get_char(R),
-	read_string(user_input, "\n", "\r", _, _),
-	(
-		(member(R,['Y','y']),write('Termino :)'),!;
-		member(R,['N','n']),write('Sigue')
-	);
-	write('Tiene que ser Y/N'),nl,leerSN(X)
-	).
-inicio:-
-    dinamicaParaAdivinar,
-    leerSN,
-    eliminarDinamicaParaAdivinar,!.
 /*******************************************************************************/
 
 leerNumero(N1,N2,N3,N4):-
