@@ -2,42 +2,53 @@
 codigo repetido
 */
 
-/*Esta funcion recibe una lista con numeros y retorna su suma
-    [1,1,1,1] = 4
-    sirve para contar los numeros que estan en valorYpos bien o los de solo valor
-    y tambien para el numero de rondas*/
-succ([],0).
-succ([X|Resto],Resultado):-
-    succ(Resto,Resultado1),
-    Resultado is X + Resultado1.
+/*Aumenta Rondas*/
+aumentarRondasCVP:-
+    rondasCVP(R),
+    retract(rondasCVP(R)),
+    R1 is R + 1,
+    assert(rondasCVP(R1)).
+
+eliminarRondasCVP:-
+  (retract(rondasCVP(_)), eliminarRondasCVP;write('Memoria Limpia: rondasCVP')).
+
+
 /*Aumenta lista que contiene la cantidad de ValorYPos igual*/
-succB:-
-    buenos(B),
-    retract(buenos(B)),
-    append([1],B,NB),
-    assert(buenos(NB)).
+aumentarBuenosCVP:-
+    buenosCVP(B),
+    retract(buenosCVP(B)),
+    B1 is B + 1,
+    assert(buenosCVP(B1)).
 
 /*Aumenta lista que contiene la cantidad de solo valor igual*/
-succR:-
-    regulares(R),
-    retract(regulares(R)),
-    append([1],R,NR),
-    assert(regulares(NR)).
+aumentarRegularesCVP:-
+  regularesCVP(R),
+  retract(regularesCVP(R)),
+  R1 is R + 1,
+  assert(regularesCVP(R1)).
 
-beginB_R:-
-    (retract(buenos(_)) , assert(buenos([])); assert(buenos([])) ),
-    (retract(regulares(_)) , assert(regulares([])) ; assert(regulares([]))).
-deleteB_R:-
-    retract(buenos(_)),
-    retract(regulares(_)).
+genBuenosCVP:-
+    assert(buenosCVP(0)).
+eliBuenosCVP:-
+  (retract(buenosCVP(_)) , eliBuenosCVP;!).
+
+genRegularesCVP:-
+  assert(regularesCVP(0)).
+eliRegularesCVP:-
+  (retract(regularesCVP(_)) , eliRegularesCVP;!).
+
+
+buenosRegularesCVP:-
+  eliBuenosCVP,genBuenosCVP,
+  eliRegularesCVP,genRegularesCVP.
 
 checkV(E, [X], Restante):-
-    (E == X, Restante = [], succR,!
+    (E == X, Restante = [], aumentarRegularesCVP,!
     ;
     Restante = [X]).
 
 checkV(E,[X|Resto],Restante):-
-    (E == X, Restante = Resto, succR,!
+    (E == X, Restante = Resto, aumentarRegularesCVP,!
     ;
     checkV(E,Resto,Restante2), append([X],Restante2,Restante)).
 
@@ -47,21 +58,16 @@ checkV([A|Resto],Lista):-
     checkV(A,Lista,Resultado),checkV(Resto,Resultado).
 
 check([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
-    beginB_R,
+    buenosRegularesCVP,
     Pro = [],
     Cor = [],
-    (A == E, succB,Pro1 = Pro, Cor1 = Cor; append([A],Pro,Pro1), append([E],Cor,Cor1)),
-    (B == F, succB,Pro2 = Pro1, Cor2 = Cor1; append([B],Pro1,Pro2), append([F],Cor1,Cor2)),
-    (C == G, succB,Pro3 = Pro2, Cor3 = Cor2; append([C],Pro2,Pro3), append([G],Cor2,Cor3)),
-    (D == H, succB,Pro4 = Pro3, Cor4 = Cor3; append([D],Pro3,Pro4), append([H],Cor3,Cor4)),
+    (A == E, aumentarBuenosCVP,Pro1 = Pro, Cor1 = Cor; append([A],Pro,Pro1), append([E],Cor,Cor1)),
+    (B == F, aumentarBuenosCVP,Pro2 = Pro1, Cor2 = Cor1; append([B],Pro1,Pro2), append([F],Cor1,Cor2)),
+    (C == G, aumentarBuenosCVP,Pro3 = Pro2, Cor3 = Cor2; append([C],Pro2,Pro3), append([G],Cor2,Cor3)),
+    (D == H, aumentarBuenosCVP,Pro4 = Pro3, Cor4 = Cor3; append([D],Pro3,Pro4), append([H],Cor3,Cor4)),
     checkV(Pro4,Cor4),
-    buenos(Bue),
-    regulares(Reg),
-    succ(Bue,Buenos),
-    succ(Reg,Regulares),
-    %%write('Iguales en valor y posicion: '),write(Buenos),nl,
-    %%write('Iguales en valor: '),write(Regulares),
-    deleteB_R.
+    buenosCVP(Buenos),
+    regularesCVP(Regulares).
 
 
 
@@ -78,24 +84,19 @@ f(7).
 f(8).
 f(9).
 
-%%secuenciasAll(A),length(A,X).
-
-
-
-
-
 secuencia(X,Y,Z,J):-
 	f(X),f(Y),f(Z),f(J).
 
 eliminarListaSecuencias:-
-	retract(secuenciasAll(_)).
-
-
+	(retract(secuenciasAll(_)),eliminarListaSecuencias;nl,write('Memoria Limpia: secuenciasAll'),nl).
 
 listaSecuencias:-
+    eliminarListaSecuencias,
     findall([X,Y,Z,J],secuencia(X,Y,Z,J),A),
-		assert(secuenciasAll(A)),nl,
-		write(A),nl.
+		assert(secuenciasAll(A)).
+
+
+
 
 leerVP(N1):-
 	nl,
@@ -119,20 +120,12 @@ leerV(N1):-
 	    leerVP(A1),N1 = A1).
 
 leerSN(P):-
+  rondasCVP(Ronda),nl,
+  write('Ronda '), write(Ronda),
 	nl,
 	write('Su numero es: '),write(P),write('?(Y/N)'),nl,
-	get_char(R),
-	read_string(user_input, "\n", "\r", _, _),
-	(
-		(member(R,['Y','y']),write('Termino :)'),!;
-		member(R,['N','n']),seguir(P)
-	);
-	write('Tiene que ser Y/N'),nl,leerSN(P)
-	).
-
-
-
-
+	get_char(R), read_string(user_input, "\n", "\r", _, _),
+	((member(R,['Y','y']), write('Termino :)'); member(R,['N','n']),aumentarRondasCVP, seguir(P)); write('Tiene que ser Y/N'), nl, leerSN(P)).
 
 reducirLista(P,VP,V,[],[]):-!.
 reducirLista(P,VP,V,[X|Resto],Resultado):-
@@ -145,7 +138,7 @@ reducirLista(P,VP,V):-
 	secuenciasAll(A),
 	reducirLista(P,VP,V,A,NewSecu),
 	retract(secuenciasAll(A)),
-	assert(secuenciasAll(NewSecu)),nl,nl,write(NewSecu),nl,nl.
+	assert(secuenciasAll(NewSecu)).
 
 seguir(P):-
 		leerVP(VPchar),
@@ -162,27 +155,17 @@ pop([X|Resto],Num,B,[X|Rest]):-
 		N is Num - 1,
 		pop(Resto,N,B,Rest).
 
-remove([],P,[]):-!.
-remove([P|Resto],P,Resto):-!.
-remove([X|Resto],P,[X|Rest]):-
-	remove(Resto,P,Rest).
-
-
 primeraSecuencia(OneSecu):-
 	secuenciasAll(A),
-	%%write(A),nl,nl,
 	length(A,X),
-	%%write('Random: '),write(X),nl,nl,
-	(X == 0,write('Mentiroso :3'),OneSecu = [0];
+	(X == 0,nl,write('Mentiroso :3'),eliminarRondasCVP,assert(rondasCVP(0)),nl,OneSecu = [0];
 	random(0,X,Random),
-
 	pop(A,Random,OneSecu,NewSecu),
-	%%write(OneSecu),nl,
-	%%write(NewSecu),nl,
 	retract(secuenciasAll(A)),
 	assert(secuenciasAll(NewSecu))).
 
-iniciarJuego:-
+playCVP:-
+    eliminarRondasCVP,assert(rondasCVP(1)),
 		listaSecuencias,
 		primeraSecuencia(Secu),nl,
 		leerSN(Secu),
