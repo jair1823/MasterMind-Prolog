@@ -1,7 +1,6 @@
 /*
     Luis Jair Cordero Barona
     2017107227
-
 */
 
 /*Se encarga de generar la ruta donde se van a crear todos los archivos
@@ -10,31 +9,11 @@ path_file(Name,Path):-
     working_directory(Dir,Dir),
     atom_concat(Dir,Name,Path).
 
+/**/
 borrarPantalla:-
      write('\033[2J'),shell(clear).
 
-marge:-
-    write(" ("),nl,
-    write("  \\  _,--._,-.__,         )"),nl,
-    write("  / (,  ,       ,`-._    /"),nl,
-    write(" (  ,^--^-. ;--^--/ (    \\"),nl,
-    write("  :'      `/       \\ )   /"),nl,
-    write("  (  o    (   o    |(  \\'"),nl,
-    write("   \\  ,----\\       /(,-.)"),nl,
-    write("  ,'`-\\___  `.___,'  ,. )"),nl,
-    write(",'                   __/"),nl,
-    write("`-.______________   |,---,"),nl,
-    write("      `-^;-^--^-'\\  |   '----,"),nl,
-    write("        ( '------'  .',-.___/"),nl,
-    write("         ;._____,--' / \\"),nl,
-    write(" -hrr-  (           /   \\"),nl,
-    write("        (`-        /     \\"),nl,
-    write("         \\       ,'       \\"),nl,
-    write("        / )  _,-'          \\").
-
-
 /************************************************************************/
-
 initMasterMind:-
   assert(correcto([])),
   assert(rondasPVC(0)),
@@ -45,7 +24,7 @@ initMasterMind:-
 
 /*Estas dos ultimas se encargan de generar y eliminar un numero aleatorio para cada juego*/
 eliminarCorrecto:-
-    (retract(correcto(_)), eliminarCorrecto;write('Memoria Limpia: Correcto')).
+    (retract(correcto(_)), eliminarCorrecto;!).
 
 generarCorrecto:-
     random(0,10,N1),
@@ -55,31 +34,27 @@ generarCorrecto:-
     assert(correcto([N1,N2,N3,N4])).
 
 eliminarRondasPVC:-
-  (retract(rondasPVC(_)), eliminarRondasPVC;write('Memoria Limpia: rondasPVC')).
-
-
+  (retract(rondasPVC(_)), eliminarRondasPVC;!).
 
 /*Conjunto de funciones que se encargan de crear y borrar todas los hechos dinamos que necesitamos*/
-
-
 iniciarDinamicas:-
     eliminarRondasPVC,assert(rondasPVC(1)),
     eliminarCorrecto,generarCorrecto,
     correcto(A),
+    nl,nl,
     write(A),
     nl,nl,
     write('Oculto: '),write('[?,?,?,?]').
 
-
 genBuenosPVC:-
     assert(buenosPVC(0)).
 eliBuenosPVC:-
-  (retract(buenosPVC(_)) , eliBuenosPVC; nl,write('Memoria Limpia: buenosPVC'),nl).
+  (retract(buenosPVC(_)) , eliBuenosPVC;!).
 
 genRegularesPVC:-
   assert(regularesPVC(0)).
 eliRegularesPVC:-
-  (retract(regularesPVC(_)) , eliRegularesPVC; nl,write('Memoria Limpia: regularesPVC'),nl).
+  (retract(regularesPVC(_)) , eliRegularesPVC;!).
 
 
 buenosRegularesPVC:-
@@ -114,11 +89,7 @@ aumentarRondasPVC:-
 /*Esta funcion se encarga de revisar si el usuario dio el numero exacto que tenemos generado
     Tambien muestra la victoria del usuario
     Esta tiene que saltar a ganaUsuario(Cuando user gana)*/
-chequearPVC([A,B,C,D],[A,B,C,D],_,_):-
-    nl,nl,
-    write('EL NUMERO ES CORRECTO'),nl,nl,rondasPVC(R),write('Total de rondas'),write(R),nl.
-    /*rondasPVC(R),
-    ganaUsuario(R).*/
+
 
 chequearPVCvalor(E, [X], Restante):-
     (E == X, Restante = [], aumentarRegularesPVC,!
@@ -134,6 +105,10 @@ chequearPVCvalor([A],Lista):-
     chequearPVCvalor(A,Lista,_),!.
 chequearPVCvalor([A|Resto],Lista):-
     chequearPVCvalor(A,Lista,Resultado),chequearPVCvalor(Resto,Resultado).
+
+chequearPVC([A,B,C,D],[A,B,C,D],_,_):-
+    nl,nl,
+    write('Ese numero es correcto.'),nl,nl,rondasPVC(R),write('Total de rondas en adivinarlo: '),write(R),nl.
 
 chequearPVC([A,B,C,D],[E,F,G,H],Buenos,Regulares):-
     buenosRegularesPVC,
@@ -193,38 +168,49 @@ playPVC:-
     propuesto(Propuesto),nl,
     write('Propuesto: '),write(Propuesto),nl,
     correcto(Correcto),
-    chequearPVC(Propuesto,Correcto,I,J).
+    chequearPVC(Propuesto,Correcto,_,_).
 
 
 /************************************************************************/
+onlySpace([X]):-
+  X == "",!.
+onlySpace([X|Resto]):-
+  X == "",
+  onlySpace(Resto).
 
 /*Esta funcion se encarga de solicitar el nombre por consola
     Tambien lo guarda en un archivo temporal
     y lo consulta*/
 pedirNombre:-
     path_file('temp.pl',Path),
-    write('Digite su nombre'),nl,
+    write('Ingrese su nickname'),nl,
     tell(Path),
+
     read_string(user_input, "\n", "\r", _, X),
+    split_string(X, " ", "", L),
+    (onlySpace(L), told, pedirNombre;
     write('jugador('),write('"'),write(X),write('"'),write(').'),
     told,
-    consult(Path).
+    consult(Path)).
 
 definirGanador(R,R):-
   nl,
-  write('Empataron... Es decir que ninguno gano :3'),
+  write('Empataron... Ninguno gana, intenta otra vez :)'),
   nl.
 definirGanador(RS,RC):-
     RS < RC,
     nl,
     marge,
-    write('Felicidades le ganaste a la maquina'),
+    nl,
+    printGanaste,
+    nl,
     nl,
     ganaUsuario(RS).
 definirGanador(RS,RC):-
     RC < RS,
     nl,
-    write('Perdiste :P'),
+    write('La computadora adivino el numero en menos rondas'),nl,
+    printPerdiste,
     nl.
 /*Esta solo es una funcion de ayuda para saltar a playPVC con todo iniciado correctamente*/
 jugar:-
@@ -235,10 +221,10 @@ jugar:-
     rondasPVC(RS),
     rondasCVP(RC),
     nl,
-    write('Del usuario: '),write(RS),
+    write('Rondas que tardo el usuario para adivinar: '),write(RS),
     nl,
     nl,
-    write('De la maquina: '),write(RC),
+    write('Rondas que tardo la computadora en adivinar: '),write(RC),
     nl,
 
     definirGanador(RS,RC).
@@ -247,7 +233,7 @@ jugar:-
 /*funcion para borrar todos los puntajes
     solo utilizada en tiempos desarrollo del juego*/
 cleanPuntaje:-
-    writeln('Clean'),
+    writeln('Limpiando puntaje'),
     path_file('puntaje.pl',Path),
     tell(Path),
     write( 'puntaje(' ) ,
@@ -266,7 +252,7 @@ ganaUsuario(R):-
     consult(Path), /*Con esto obtenjo los puntajes*/
     puntaje(P),
     jugador(J),
-    write('Rondas : '),write(R),nl,/*ronda(R)*/
+    %write('Rondas : '),write(R),nl,/*ronda(R)*/
     append([R],[J],JR),
     my_append(JR,P,NewP),
     tell(Path),
@@ -274,15 +260,6 @@ ganaUsuario(R):-
     writeq(NewP),
     write( ').' ),
     told.
-
-
-
-/*
-catch(consult('caca.pl'), E, tell('caca.pl')).
-*/
-
-
-
 
 /*escribirPuntaje y mostrarPuntaje son solo funciones de ayuda para imprimir la lista de puntajes en pantalla*/
 escribirPuntaje([]):-
@@ -305,19 +282,15 @@ verPuntaje:-
     catch(puntaje(P), _, cleanPuntaje),
     consult(Path),
     borrarPantalla,
-    write('Lista de puntajes'),nl,nl,
+    listaDePuntajes,nl,nl,
     write('Rondas'),put(9),put(9),write('Nombre'),nl,nl,
      /*Con esto obtenjo los puntajes*/
     mostrarPuntaje(P).
-
 
 /*Funciones de append para caso especial*/
 my_append([],[],[]).
 my_append([],Lista,Lista).
 my_append(Lista1,Lista2,[Lista1|Lista2]).
-
-
-
 
 /*Opcion para jugar*/
 opcion("1"):- jugar,nl,run.
@@ -326,25 +299,28 @@ opcion("1"):- jugar,nl,run.
 opcion("2"):- write('-----------------------------------'),nl,verPuntaje,nl,nl,write('-----------------------------------'),nl,nl,run.
 
 /*opcion para salir del programa*/
-opcion(_):- write("Se cerro el programa :D"),nl,nl,halt.
+opcion(_):- write("Se cerro el programa :D"),nl,nl,informacacion.
 
 /*Funcion que muestra las opciones del programa
     Solicita una opcion y con respecto a esta:
         Comienza un juego
         Muestra los puntajes
         Sale del juego
+
 */
 menu:-
-    write('1. Jugar.'),nl,
-    write('2. Ver puntajes.'),nl,
-    write('Cualquier otro para salir'),nl,nl,
-    write('Digite el numero'),nl,read_string(user_input, "\n", "\r", _, String),borrarPantalla,nl,
+    printMasterMind,
+    nl,nl,
+    write('                 Jugar (1)'),nl,
+    write('                 Ver puntajes (2)'),nl,
+    write('                 Cualquier otro para salir'),nl,nl,
+    write('                 Digite el numero'),nl,read_string(user_input, "\n", "\r", _, String),borrarPantalla,nl,
     opcion(String).
 
 /*Funcion para el loop del menu*/
 run:- menu,nl.
 
 informacacion:-
-  nl,write("Utilizar la sentencia 'menu.' para comenzar el juego."),nl.
+  borrarPantalla,nl,write("Utilizar la sentencia 'menu.' para comenzar el juego. :)"),nl.
 
-:- ['adivinar.pl'],borrarPantalla,initMasterMind,informacacion.
+:- ['adivinar.pl','prints.pl'],initMasterMind,informacacion.

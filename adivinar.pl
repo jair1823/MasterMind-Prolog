@@ -1,6 +1,4 @@
-/*
-codigo repetido
-*/
+
 
 /*Aumenta Rondas*/
 aumentarRondasCVP:-
@@ -10,7 +8,7 @@ aumentarRondasCVP:-
     assert(rondasCVP(R1)).
 
 eliminarRondasCVP:-
-  (retract(rondasCVP(_)), eliminarRondasCVP;write('Memoria Limpia: rondasCVP')).
+  (retract(rondasCVP(_)), eliminarRondasCVP;!).
 
 
 /*Aumenta lista que contiene la cantidad de ValorYPos igual*/
@@ -88,7 +86,7 @@ secuencia(X,Y,Z,J):-
 	f(X),f(Y),f(Z),f(J).
 
 eliminarListaSecuencias:-
-	(retract(secuenciasAll(_)),eliminarListaSecuencias;nl,write('Memoria Limpia: secuenciasAll'),nl).
+	(retract(secuenciasAll(_)),eliminarListaSecuencias;!).
 
 listaSecuencias:-
     eliminarListaSecuencias,
@@ -125,9 +123,12 @@ leerSN(P):-
 	nl,
 	write('Su numero es: '),write(P),write('?(Y/N)'),nl,
 	get_char(R), read_string(user_input, "\n", "\r", _, _),
-	((member(R,['Y','y']), write('Termino :)'); member(R,['N','n']),aumentarRondasCVP, seguir(P)); write('Tiene que ser Y/N'), nl, leerSN(P)).
 
-reducirLista(P,VP,V,[],[]):-!.
+	((member(R,['Y','y']), nl;
+    member(R,['N','n']),aumentarRondasCVP, seguir(P))
+    ; write('Tiene que ser Y/N'), nl, leerSN(P)).
+
+reducirLista(_,_,_,[],[]):-!.
 reducirLista(P,VP,V,[X|Resto],Resultado):-
 		check(P,X,PV1,V1),
 		(VP == PV1, V == V1, reducirLista(P,VP,V,Resto,Rest), append([X],Rest,Resultado);
@@ -158,7 +159,7 @@ pop([X|Resto],Num,B,[X|Rest]):-
 primeraSecuencia(OneSecu):-
 	secuenciasAll(A),
 	length(A,X),
-	(X == 0,nl,write('Mentiroso :3'),eliminarRondasCVP,assert(rondasCVP(0)),nl,OneSecu = [0];
+	(X == 0,nl,write('Has mentido o te has equivocado en alguna de las respuestas.'),eliminarRondasCVP,assert(rondasCVP(0)),nl,OneSecu = [0];
 	random(0,X,Random),
 	pop(A,Random,OneSecu,NewSecu),
 	retract(secuenciasAll(A)),
