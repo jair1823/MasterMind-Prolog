@@ -1,3 +1,6 @@
+/*Archivo solo con prints que se mostraran durante el juego*/
+
+
 listaDePuntajes:-
 writeln(' _      _     _              _                          _        _          '),
 writeln('| |    (_)   | |            | |                        | |      (_)         '),
@@ -10,23 +13,23 @@ writeln('                                     |_|                      |__/     
 
 marge:-
     nl,nl,
-    write("     ("),nl,
-    write("      \\  _,--._,-.__,         )"),nl,
-    write("      / (,  ,       ,`-._    /"),nl,
-    write("     (  ,^--^-. ;--^--/ (    \\"),nl,
-    write("      :'      `/       \\ )   /"),nl,
-    write("      (  o    (   o    |(  \\'"),nl,
-    write("       \\  ,----\\       /(,-.)"),nl,
-    write("      ,'`-\\___  `.___,'  ,. )"),nl,
-    write("    ,'                   __/"),nl,
-    write("    `-.______________   |,---,"),nl,
-    write("          `-^;-^--^-'\\  |   '----,"),nl,
-    write("            ( '------'  .',-.___/"),nl,
-    write("             ;._____,--' / \\"),nl,
-    write("            (           /   \\"),nl,
-    write("            (`-        /     \\"),nl,
-    write("             \\       ,'       \\"),nl,
-    write("            / )  _,-'          \\").
+    write('        '),write("     ("),nl,
+    write('        '),write("      \\  _,--._,-.__,         )"),nl,
+    write('        '),write("      / (,  ,       ,`-._    /"),nl,
+    write('        '),write("     (  ,^--^-. ;--^--/ (    \\"),nl,
+    write('        '),write("      :'      `/       \\ )   /"),nl,
+    write('        '),write("      (  o    (   o    |(  \\'"),nl,
+    write('        '),write("       \\  ,----\\       /(,-.)"),nl,
+    write('        '),write("      ,'`-\\___  `.___,'  ,. )"),nl,
+    write('        '),write("    ,'                   __/"),nl,
+    write('        '),write("    `-.______________   |,---,"),nl,
+    write('        '),write("          `-^;-^--^-'\\  |   '----,"),nl,
+    write('        '),write("            ( '------'  .',-.___/"),nl,
+    write('        '),write("             ;._____,--' / \\"),nl,
+    write('        '),write("            (           /   \\"),nl,
+    write('        '),write("            (`-        /     \\"),nl,
+    write('        '),write("             \\       ,'       \\"),nl,
+    write('        '),write("            / )  _,-'          \\").
 
 
 printGanaste:-

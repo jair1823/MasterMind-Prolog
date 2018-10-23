@@ -1,0 +1,13 @@
+Este programa consiste con 3 archivos, es necesario tener todos los archivos en la misma ruta,
+pero no es necesario consultar todos, solo 'master-mind.pl', este se encarga de consultar los demas.
+
+Cuando se ingresa al 'menu', el usuario tiene opciones de jugar, verPuntaje o salir.
+Si el usuario le miente a la maquina o se equivoca en alguna de las respuestas cuando esta esta adivinando, automaticamente ganara
+la computadora.
+El empate se considera como perder para ambos.
+
+
+En caso de querer saber la secuencia oculta que genera la computadora:
+  ir a 'master-mind.pl'
+  buscar la funcion 'iniciarDinamicas'
+  quitar el % que esta antes de write(A)
